@@ -9,14 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@auth/prisma-adapter": "^1.0.5",
     "@auth0/nextjs-auth0": "^3.2.0",
     "@prisma/client": "4.13.0",
-=======
     "@hookform/resolvers": "^3.3.2",
     "@radix-ui/react-label": "^2.0.2",
->>>>>>> 527d959 (frontend)
     "@radix-ui/react-slot": "^1.0.2",
     "axios": "^1.6.0",
     "bcrypt": "^5.1.1",
