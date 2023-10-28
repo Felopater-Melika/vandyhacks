@@ -11,34 +11,28 @@
   # };
   #
   outputs = { self, nixpkgs, flake-utils }:
-  let system = "x86_64-linux";
+    flake-utils.lib.eachDefaultSystem (system: let
+      system = "x86_64-linux";
       pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
       };
-  in with pkgs; {
-    devShells.x86_64-linux.default = mkShell {
-      buildInputs = [
-        nodejs_20
-        nodePackages.pnpm
-        prefetch-npm-deps
-      ];
-       src = [
-         ./flake.nix
-         ./flake.lock
-       ];
-
-    flake-utils.lib.eachDefaultSystem = (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
-    in {
-      devShell = pkgs.mkShell {
-        nativeBuildInputs = [ pkgs.bashInteractive ];
-        buildInputs = with pkgs; [
-      openssl
+    in with pkgs; {
+      devShells.default = mkShell {
+        buildInputs = [
+          nodejs_20
+          sqlite
+          nodePackages.pnpm
+          prefetch-npm-deps
+          openssl
           nodePackages.prisma
         ];
+        src = [
+          ./flake.nix
+          ./flake.lock
+        ];
+
         shellHook = with pkgs; ''
-   
           export PRISMA_SCHEMA_ENGINE_BINARY="${prisma-engines}/bin/schema-engine"
           export PRISMA_QUERY_ENGINE_BINARY="${prisma-engines}/bin/query-engine"
           export PRISMA_QUERY_ENGINE_LIBRARY="${prisma-engines}/lib/libquery_engine.node"
@@ -47,4 +41,4 @@
         '';
       };
     });
-  }
+}
