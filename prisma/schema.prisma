@@ -48,12 +48,12 @@ model CareTaker {
 
 // Calls table
 model Call {
-  id        Int      @id @default(autoincrement()) // Unique identifier for each call
-  tarScript String // Transcript of the call
+  id        Int       @id @default(autoincrement()) // Unique identifier for each call
   patientId Int // Foreign key linking to a patient
-  patient   Patient  @relation(fields: [patientId], references: [id])
+  patient   Patient   @relation(fields: [patientId], references: [id])
   startTime DateTime // Start time of the call
   endTime   DateTime // End time of the call
+  messages  Message[] // Relation to Messages
 
   // @@index([patientId], name: "idx_calls_patient")
 }
@@ -79,4 +79,16 @@ model FailCheckin {
   reachedCareTaker Boolean // Whether the care taker was reached or not
 
   // @@index([patientId], name: "idx_failcheckins_patient")
+}
+
+// Messages table
+model Message {
+  id      Int    @id @default(autoincrement()) // Unique identifier for each message
+  speaker String // Speaker during the call
+  message String // Message content
+  callId  Int // Foreign key linking to a call
+  call    Call   @relation(fields: [callId], references: [id])
+
+  // @@index([callId], name: "idx_messages_call")
+  @@unique([callId])
 }
