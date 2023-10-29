@@ -33,7 +33,7 @@ async def respond_to_packet(push_stream, patient_id, start_time):
     if packet['event'] == 'stop':
       end_time = datetime.now()
       print("end of call")
-      complaint = await generate_report(patient_id)
+      complaint = await ai.generate_report(patient_id)
       print(f"complaint: {complaint}")
       await api.successful_call(app.client, patient_id, start_time,
         end_time, [complaint])
