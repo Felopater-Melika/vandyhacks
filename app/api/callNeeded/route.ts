@@ -6,25 +6,30 @@ const prisma = new PrismaClient();
 
 export async function GET() {
     try {
-        const MAX_ATTEMPTS = 3; // Define the maximum number of attempts
-        const currentDateTime = dayjs(); // Get the current date and time using dayjs
+        const MAX_ATTEMPTS = 3;
+        const currentDateTime = dayjs();
 
-        const patients = await prisma.patient.findMany({
+        const checkins = await prisma.checkin.findMany({
             where: {
-                nextCallDate: {
-                    // Filter patients whose nextCallDate is less than the current time
+                nextAttemptTime: {
                     lt: currentDateTime.toDate(),
                 },
                 attemptCount: {
-                    // Filter patients whose attemptCount is less than MAX_ATTEMPTS
                     lt: MAX_ATTEMPTS,
                 },
             },
             select: {
-                id: true, // Select the patient id
-                phone: true, // Select the phone number
+                patient: {
+                    select: {
+                        id: true,
+                        phone: true,
+                    }
+                }
             },
         });
+
+        // Extract patient data from checkins
+        const patients = checkins.map(checkin => checkin.patient);
 
         return NextResponse.json({ patients }, { status: 200 });
 
