@@ -25,7 +25,7 @@ function Home() {
 
   return (
     <>
-    <body className="h-auto m-16">
+    <div className="h-auto m-16">
     {user && (
       <>
         <div className="flex justify-end w-full">
@@ -39,7 +39,7 @@ function Home() {
         {careTaker && <Chat />}
       </>
     )}
-    </body>
+    </div>
     </>
   );
 };
