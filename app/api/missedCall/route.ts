@@ -10,7 +10,7 @@ export async function POST(request: Request) {
         const { patientID } = await request.json(); // Get the patientID from the request body
 
         // Find the patient by patientID
-        const patient = await prisma.Patient.findUnique({
+        const patient = await prisma.patient.findUnique({
             where: {
                 id: patientID,
             },
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
         // Check if the patient has already reached the maximum attempts
         if (patient.attemptCount == MAX_ATTEMPTS) {
             // Log a failed check-in
-            const failedCheckin = await prisma.FailCheckin.create({
+            const failedCheckin = await prisma.failCheckin.create({
 
                 //need to get rest of the data*******
 
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
         }
 
         // Increment the attempt count for the patient
-        await prisma.Patient.update({
+        await prisma.patient.update({
             where: {
                 id: patientID,
             },

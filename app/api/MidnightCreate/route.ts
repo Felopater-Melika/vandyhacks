@@ -10,12 +10,12 @@ export async function POST() {
         const currentDate = dayjs().startOf('day'); // Set the time to the beginning of the day
 
         // Get all patients
-        const patients = await prisma.Patient.findMany();
+        const patients = await prisma.patient.findMany();
 
         // Create a new check-in for each patient for the current day
         const checkins = await Promise.all(
             patients.map(async (patient: any) => {
-                const existingCheckin = await prisma.Checkin.findFirst({
+                const existingCheckin = await prisma.checkin.findFirst({
                     where: {
                         patientId: patient.id,
                         date: currentDate.toDate(), // Convert dayjs to Date object
@@ -31,7 +31,7 @@ export async function POST() {
                 const nextAttemptTime = currentDate.set('hour', 12).toDate(); // Set to 12 noon
 
                 // Create a new check-in for the patient
-                return prisma.Checkin.create({
+                return prisma.checkin.create({
                     data: {
                         patientId: patient.id,
                         date: currentDate.toDate(), // Convert dayjs to Date object

@@ -9,7 +9,7 @@ export async function GET() {
         const MAX_ATTEMPTS = 3; // Define the maximum number of attempts
         const currentDateTime = dayjs(); // Get the current date and time using dayjs
 
-        const patients = await prisma.Patient.findMany({
+        const patients = await prisma.patient.findMany({
             where: {
                 nextCallDate: {
                     // Filter patients whose nextCallDate is less than the current time

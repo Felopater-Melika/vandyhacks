@@ -9,7 +9,7 @@ export async function POST(request: Request) {
         const { patientId, startTime, endTime, complaints } = await request.json();
 
         // Find the patient by patientId
-        const patient = await prisma.Patient.findUnique({
+        const patient = await prisma.patient.findUnique({
             where: {
                 id: patientId,
             },
@@ -20,10 +20,9 @@ export async function POST(request: Request) {
         }
 
         // Create a new Call and associate it with the patient
-        const call = await prisma.Call.create({
+        const call = await prisma.call.create({
             data: {
                 patientId: patientId,
-                patient: patient,
                 startTime: parseISO(startTime), // Parse ISO date strings to DateTime
                 endTime: parseISO(endTime),
             },
@@ -39,7 +38,7 @@ export async function POST(request: Request) {
                 };
             });
 
-            const createdComplaints = await prisma.Complaint.createMany({
+            const createdComplaints = await prisma.complaint.createMany({
                 data: complaintsData,
             });
 
