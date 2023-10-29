@@ -7,5 +7,93 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url      = "file:../dev.db"
 }
+
+// Complaints table
+model Complaint {
+  id          Int     @id @default(autoincrement()) // Unique identifier for each complaint
+  description String // Description of the complaint
+  patientId   Int // Foreign key linking to a patient in the Patients table
+  patient     Patient @relation(fields: [patientId], references: [id])
+  callId  Int  // Foreign key linking to a call
+  call    Call @relation(fields: [callId], references: [id]) // Add a relation to one Call
+
+  // @@index([patientId], name: "idx_complaints_patient")
+}
+
+// Patients table
+model Patient {
+  id           Int           @id @default(autoincrement()) // Unique identifier for each patient
+  name         String // Patient's name
+  phone        String // Patient's phone number
+  careTakerId  Int? // Foreign key linking to a care taker (made optional)
+  careTaker    CareTaker?    @relation(fields: [careTakerId], references: [id]) // Made optional
+  complaints   Complaint[] // Relation to Complaints
+  calls        Call[] // Relation to Calls
+  checkins     Checkin[] // Relation to Checkins
+  failCheckins FailCheckin[] // Relation to FailCheckins
+
+  // @@index([careTakerId], name: "idx_patients_caretaker")
+  @@unique([careTakerId])
+}
+
+// CareTaker table
+model CareTaker {
+  id        Int      @id @default(autoincrement()) // Unique identifier for each care taker
+  patientId Int? // Foreign key linking to a patient (made optional)
+  patient   Patient?
+  name      String // Care taker's name
+  phone     String // Care taker's phone number
+  email     String // Care taker's email address
+
+  @@unique([email])
+  @@unique([patientId])
+}
+
+// Calls table
+model Call {
+  id        Int       @id @default(autoincrement()) // Unique identifier for each call
+  patientId Int       // Foreign key linking to a patient
+  patient   Patient   @relation(fields: [patientId], references: [id])
+  startTime DateTime  // Start time of the call
+  endTime   DateTime  // End time of the call
+  complaints Complaint[] // Add a relation to multiple Complaints
+
+  // @@index([patientId], name: "idx_calls_patient")
+}
+
+// Checkins table
+model Checkin {
+  id              Int      @id @default(autoincrement()) // Unique identifier for each checkin
+  patientId       Int // Foreign key linking to a patient
+  patient         Patient  @relation(fields: [patientId], references: [id])
+  date            DateTime // Date of the checkin
+  attemptCount    Int // Number of attempts for this checkin
+  nextAttemptTime DateTime // Next time to attempt the checkin
+
+  // @@index([patientId], name: "idx_checkins_patient")
+}
+
+// FailCheckins table
+model FailCheckin {
+  id               Int      @id @default(autoincrement()) // Unique identifier for each fail checkin
+  patientId        Int // Foreign key linking to a patient
+  patient          Patient  @relation(fields: [patientId], references: [id])
+  date             DateTime // Date of the failed checkin
+  reachedCareTaker Boolean // Whether the care taker was reached or not
+
+  // @@index([patientId], name: "idx_failcheckins_patient")
+}
+
+// // Messages table
+// model Message {
+//   id      Int    @id @default(autoincrement()) // Unique identifier for each message
+//   speaker String // Speaker during the call
+//   message String // Message content
+//   callId  Int // Foreign key linking to a call
+//   call    Call   @relation(fields: [callId], references: [id])
+
+//   // @@index([callId], name: "idx_messages_call")
+//   @@unique([callId])
+// }
