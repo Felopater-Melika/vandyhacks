@@ -37,3 +37,11 @@ E
 components/survey.tsx,3/d/3d7f7c722df3cd797423bbc13d189565ebf5d511
 I
 app/api/retrieve/route.ts,d/5/d5f26d4a6bc6d239c53c0311b883101c2b2456d2
+]
+-.idea/sonarlint/securityhotspotstore/index.pb,8/8/88a9255124c95bdc913197c120a8d560edc59c8e
+S
+#.idea/sonarlint/issuestore/index.pb,9/f/9fe84ebb15faf917b7def6236dba604453cc61e0
+o
+?prisma/migrations/20231029031148_email_care_taker/migration.sql,f/c/fcc161283be01152706bc98c1a615d32c50e3f32
+p
+@prisma/migrations/20231029032848_email_care_taker2/migration.sql,6/9/69034d68f952214586e76df85a55ec440d119b69

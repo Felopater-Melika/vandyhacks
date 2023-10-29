@@ -30,9 +30,12 @@ const formSchema = z.object({
   careTakerNumber: z.string().regex(/^\d+$/, {
     message: 'Caretaker number must contain only digits.',
   }),
+  careTakerEmail: z.string().email({
+
+  })
 });
 
-export function Survey() {
+export function Survey({email}: {email: string}) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -40,12 +43,15 @@ export function Survey() {
       patientNumber: "",
       careTakerName: "",
       careTakerNumber: "",
+        careTakerEmail: "",
     },
   })
  
   function onSubmit(values: z.infer<typeof formSchema>) {
-    axios.post('api/registration', values)
+      axios.post('api/registration', values)
     .then((response) => {
+        localStorage.removeItem('patientId')
+        localStorage.removeItem('careTakerId')
         localStorage.setItem('patientId', response.data.patient.id);
         localStorage.setItem('careTakerId', response.data.careTaker.id);
         console.log(localStorage.getItem('patientId'));
@@ -129,8 +135,24 @@ export function Survey() {
                 <FormMessage />
               </FormItem>
             )}
-          />    
-          <div className="flex justify-center">
+          />
+            <FormField
+                control={form.control}
+                name="careTakerEmail"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel className="text-[#14213d] text-md">Caretaker Email</FormLabel>
+                        <FormControl>
+                            <Input className="bg-[#e5e5e5]" placeholder={email}  {...field} />
+                        </FormControl>
+                        {/* <FormDescription>
+                  This is your public display name.
+                </FormDescription> */}
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <div className="flex justify-center">
             <Button type="submit" className="mx-auto w-32 text-[#14213d] hover:bg-[#14213d] hover:text-[#e5e5e5] bg-[#e5e5e5]">Submit</Button>
           </div>
         </form>

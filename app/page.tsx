@@ -12,19 +12,13 @@ import axios from 'axios';
 
 function Home() {
   const { user } = useUser();
-  const { firstTime, setFirstTime } = useState(false);
+  const [careTaker, setCareTaker] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
       axios.post('/api/retrieve', {email: user.email}).then(res => {
-        if (res.status == 200) {
-          console.log(res.data);
-          setFirstTime(false);
-        } else {
-          setFirstTime(true);
-        }
+        setCareTaker(res.data.careTaker)
       });
-
     }
   }, [user]);
 
@@ -37,7 +31,7 @@ function Home() {
         <a className="w-[120px] bg-[#14213d] text-[#e5e5e5] text-center p-4 rounded-lg text-md hover:bg-[#635dff] hover:text-[#14213d] duration-150" href="/api/auth/logout">Logout</a>
       </div>
         <h1 className="text-5xl font-bold text-center m-16 text-[#14213d] underline decoration-[#635dff]">ElderBytes</h1>
-        {!firstTime && <Survey></Survey>}
+      {!careTaker && <Survey email={user.email ? user.email : ""}></Survey>}
         <Stats></Stats>
       </>
     )}
