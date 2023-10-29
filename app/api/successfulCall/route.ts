@@ -6,7 +6,9 @@ const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
     try {
-        const { patientId, startTime, endTime, complaints } = await request.json();
+        const requestBody = await request.json();
+        const { startTime, endTime, complaints } = requestBody;
+        const patientId = parseInt(requestBody.patientId, 10);
 
         const patient = await prisma.patient.findUnique({
             where: {
@@ -27,6 +29,7 @@ export async function POST(request: Request) {
         });
 
         if (complaints && complaints.length > 0) {
+            console.log('Processing complaints...');
             const complaintsData = complaints.map((complaint: string) => {
                 return {
                     description: complaint,
@@ -34,6 +37,7 @@ export async function POST(request: Request) {
                     callId: call.id,
                 };
             });
+
 
             for (let complaintData of complaintsData) {
                 await prisma.complaint.create({
@@ -47,6 +51,8 @@ export async function POST(request: Request) {
         console.error('Error creating call and complaints:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     } finally {
+        console.log('Disconnecting Prisma client...');
         await prisma.$disconnect();
+        console.log('Prisma client disconnected.');
     }
 }

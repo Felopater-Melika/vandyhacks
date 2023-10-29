@@ -6,32 +6,25 @@ const prisma = new PrismaClient();
 
 export async function POST() {
     try {
-        // Get the current date
         const currentDate = dayjs().startOf('day'); // Set the time to the beginning of the day
 
-        // Get all patients
         const patients = await prisma.patient.findMany();
+        console.log("Patients:", patients)
+        const checkins = [];
 
-        // Create a new check-in for each patient for the current day
-        const checkins = await Promise.all(
-            patients.map(async (patient: any) => {
-                const existingCheckin = await prisma.checkin.findFirst({
-                    where: {
-                        patientId: patient.id,
-                        date: currentDate.toDate(), // Convert dayjs to Date object
-                    },
-                });
+        for (let patient of patients) {
+            const existingCheckin = await prisma.checkin.findFirst({
+                where: {
+                    patientId: patient.id,
+                    date: currentDate.toDate(), // Convert dayjs to Date object
+                },
+            });
 
-                // If a check-in for today already exists for the patient, skip creating a new one
-                if (existingCheckin) {
-                    return existingCheckin;
-                }
-
-                // Set the nextAttemptTime to 12 noon
+            console.log("Existing Checkin:", existingCheckin)
+            if (!existingCheckin) {
                 const nextAttemptTime = currentDate.set('hour', 12).toDate(); // Set to 12 noon
 
-                // Create a new check-in for the patient
-                return prisma.checkin.create({
+                const newCheckin = await prisma.checkin.create({
                     data: {
                         patientId: patient.id,
                         date: currentDate.toDate(), // Convert dayjs to Date object
@@ -39,13 +32,18 @@ export async function POST() {
                         nextAttemptTime,
                     },
                 });
-            })
-        );
 
-        return NextResponse.json({ message: "successful" }, { status: 200 });
-    } catch (error) {
+                checkins.push(newCheckin);
+            } else {
+                checkins.push(existingCheckin);
+            }
+        }
+
+        return NextResponse.json({ message: "successful", checkins }, { status: 200 });
+
+    } catch (error: any) {
         console.error("Error creating check-ins:", error);
-        return NextResponse.json({ message: "Error creating check-ins" }, { status: 500 });
+        return NextResponse.json({ message: `Error: ${error.message}` }, { status: 500 });
     } finally {
         await prisma.$disconnect();
     }
