@@ -17,6 +17,7 @@
     "axios": "^1.6.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "dayjs": "^1.11.10",
     "lucide-react": "^0.290.0",
     "next": "14.0.0",
     "next-themes": "^0.2.1",
