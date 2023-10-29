@@ -17,6 +17,7 @@ openai = "^0.28.1"
 tiktoken = "^0.5.1"
 twilio = "^8.10.0"
 google-cloud = "^0.34.0"
+google-cloud-texttospeech = "^2.14.2"
 
 
 [build-system]

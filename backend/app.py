@@ -6,7 +6,7 @@ import audioop
 import base64
 from quart import Quart, request, websocket
 from quart import copy_current_websocket_context
-from speech_recognizer import start_audio_recognizer, generate_speech
+from speech_recognizer import start_audio_recognizer, synth_speech
 import call
 
 dotenv.load_dotenv()
@@ -27,18 +27,18 @@ async def respond_to_packet(push_stream, write):
       audio = base64.b64decode(packet['media']['payload'])
       audio = audioop.ulaw2lin(audio, 2)
       audio = audioop.ratecv(audio, 2, 1, 8000, 16000, None)[0]
-      json_str = json.dumps({
-        "event": "media",
-        "streamSid":packet['streamSid'],
-        "media":{
-          "payload":packet['media']['payload']
-        },
-      })
-      await websocket.send(json_str)
+      # json_str = json.dumps({
+      #   "event": "media",
+      #   "streamSid":packet['streamSid'],
+      #   "media":{
+      #     "payload":packet['media']['payload']
+      #   },
+      # })
+      # await websocket.send(json_str)
       push_stream.write(audio)
       # print("wrote message to audio")
-    else:
-      raise ValueError(f"unknown event {packet['event']}")
+    # else:
+      # raise ValueError(f"unknown event {packet['event']}")
 
 async def wait_for_start():
   """returns callSid"""
@@ -53,11 +53,22 @@ async def wait_for_start():
 # https://www.twilio.com/docs/voice/twiml/stream#message-media-to-twilio
 # Actually don't need this because I'm using the say trick
 
-async def call_socket():
-  print("recieved websocket thing")
+msg_queue = asyncio.Queue()
+
+@app.route('/twilio/respond', methods=['GET','POST'])
+async def redirect():
+  print("starting redirect!")
+  # target_num = request.args.get('To')
+  # if target_num in queues and not queues[target_num].empty():
+  if msg_queue.empty():
+    msg = await msg_queue.get()
+    print("got a message!")
+    return call.make_respond(msg)
+  else:
+    return call.make_respond(None)
 
 @app.websocket("/twilio/call_stream")
-async def call_socket2():
+async def call_socket():
   try:
     print("recieved websocket thing")
     stream_sid, call_sid = await wait_for_start()
@@ -65,7 +76,8 @@ async def call_socket2():
     @copy_current_websocket_context
     async def write_to_socket(raw):
       print("write_to_socket start")
-      audio = audioop.lin2ulaw(raw, 2)
+      # audio = audioop.lin2ulaw(raw, 2)
+      audio = raw
       encoded = str(base64.b64encode(audio))
       json_str = json.dumps({
         "event": "media",
@@ -78,7 +90,8 @@ async def call_socket2():
 
     async def send_msg(msg):
       print("send msg start")
-      loop = asyncio.get_running_loop()
+      audio_data = await synth_speech(msg)
+      await write_to_socket(audio_data)
       # audio_data = await asyncio.to_thread(generate_speech, msg)
       #await write_to_socket(audio_data)
 

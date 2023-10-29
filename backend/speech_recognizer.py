@@ -6,24 +6,36 @@ from quart import copy_current_websocket_context
 import azure.cognitiveservices.speech as speech
 import azure.cognitiveservices.speech.audio as saudio
 from dotenv import load_dotenv
+from google.cloud import texttospeech_v1
 
-class StreamCallback(saudio.PushAudioOutputStreamCallback):
-  def __init__(self, loop, write_co):
-    self.loop = loop
-    self.write_co = write_co
-    self.future = asyncio.Future(loop=loop)
 
-  def close(self):
-    pass
-    self.future.set_result(None)
+async def synth_speech(msg):
+  # Create a client
+  client = texttospeech_v1.TextToSpeechAsyncClient()
 
-  def write(self, view):
-    print("writing from callback obj")
-    data = bytes(view)
-    fut = asyncio.run_coroutine_threadsafe(self.write_co(data), self.loop)
-    fut.result()
-    return len(view)
-  
+  # Initialize request argument(s)
+  input = texttospeech_v1.SynthesisInput()
+  input.text = msg
+
+  voice = texttospeech_v1.VoiceSelectionParams()
+  voice.language_code = "en-US"
+
+  audio_config = texttospeech_v1.AudioConfig()
+  audio_config.audio_encoding = "MULAW"
+  audio_config.sample_rate_hertz = 8000
+
+  request = texttospeech_v1.SynthesizeSpeechRequest(
+    input=input,
+    voice=voice,
+    audio_config=audio_config,
+  )
+
+  # Make the request
+  response = await client.synthesize_speech(request=request)
+
+  # Handle the response
+  return response.audio_content
+
 
 def generate_speech(text):
   # asyncio.to_thread if I need to
@@ -103,8 +115,8 @@ def start_audio_recognizer(handle_event):
         msg = ''
     coro = handle_event(msg)
     future = asyncio.run_coroutine_threadsafe(coro, loop)
-    res = future.result()
-    print(f"waited for result {res}")
+    # res = future.result()
+    # print(f"waited for result {res}")
 
   # We don't need the partial recognition events right now.
   # We could send them to the website and have them show up live as people are

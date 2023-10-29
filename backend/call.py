@@ -3,7 +3,7 @@ import os
 import dotenv
 import logging
 from twilio.rest import Client
-from twilio.twiml.voice_response import VoiceResponse, Connect
+from twilio.twiml.voice_response import VoiceResponse, Connect, Start
 from twilio.http.async_http_client import AsyncTwilioHttpClient
 
 dotenv.load_dotenv()
@@ -16,7 +16,17 @@ def build_client():
   client = Client(account_sid, auth_token, http_client=twilio_http)
   twilio_http.logger.setLevel(logging.INFO)
   return client
-base_url = os.environ.get('BASE_URL', "dee5-129-59-122-134.ngrok-free.app")
+base_url = os.environ.get('BASE_URL', "4a2e-129-59-122-134.ngrok-free.app")
+
+def make_respond(msg):
+  res = VoiceResponse()
+  if msg is None:
+    res.pause(length=1)
+  else:
+    res.say(msg)
+  res.redirect(f'https://{base_url}/twilio/respond', method='POST')
+  print(f"make response {msg}")
+  return str(res)
 
 async def call_number(number):
   client = build_client()
@@ -31,6 +41,7 @@ async def call_number(number):
   # response.say("HELLO WORLD!")
   response.say("hello")
   response.append(connect)
+  # response.redirect(f'https://{base_url}/twilio/respond', method='POST')
   create_res = await client.calls.create_async(
     twiml=response,
     to=number,
