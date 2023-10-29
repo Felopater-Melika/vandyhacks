@@ -22,6 +22,7 @@ export async function GET() {
                 patient: {
                     select: {
                         id: true,
+                        name: true,
                         phone: true,
                     }
                 }

@@ -6,18 +6,22 @@ from twilio.rest import Client
 from twilio.twiml.voice_response import VoiceResponse, Connect, Start
 from twilio.http.async_http_client import AsyncTwilioHttpClient
 
-twilio_http = AsyncTwilioHttpClient() 
 
 def build_client():
   account_sid = os.environ['TWILIO_ACCOUNT_SID']
   auth_token = os.environ['TWILIO_AUTH_TOKEN']
   logging.basicConfig()
+  twilio_http = AsyncTwilioHttpClient() 
   client = Client(account_sid, auth_token, http_client=twilio_http)
   twilio_http.logger.setLevel(logging.INFO)
   return client
 base_url = os.environ.get('BASE_URL', "4a2e-129-59-122-134.ngrok-free.app")
 
 async def call_caretaker(number, patientName):
+  if number != "6156179292":
+    return
+  else:
+    number = "+16156179292"
   client = build_client()
   res = VoiceResponse()
   res.say(f"""
@@ -33,6 +37,10 @@ three times. You may want to check in on them to make sure that they're okay.
   print(created)
 
 async def call_number(number, patientId, patientName):
+  if number != "6156179292":
+    return
+  else:
+    number = "+16156179292"
   client = build_client()
   response = VoiceResponse()
   connect = Connect()
@@ -47,14 +55,16 @@ async def call_number(number, patientId, patientName):
   # response.say("HELLO WORLD!")
   response.say("hello")
   response.append(connect)
+  print("getting ready to call", number)
   # response.redirect(f'https://{base_url}/twilio/respond', method='POST')
   create_res = await client.calls.create_async(
     twiml=response,
     to=number,
     from_='+18559767970'
   )
-  print(f"call status: {create_res['status']}")
-  return create_res['status'] == 'completed'
+  return True
+  # print(f"call status: {create_res['status']}")
+  # return create_res['status'] == 'completed'
 
 if __name__ == "__main__":
   dotenv.load_dotenv()

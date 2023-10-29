@@ -3,6 +3,8 @@ import asyncio
 import os
 import json
 import datetime
+import call
+from dotenv import load_dotenv
 
 # Get the session
 # async with aiohttp.ClientSession() as session:
@@ -20,14 +22,19 @@ def make_checkins():
       await create_day_checkins(session)
   asyncio.run(body())
 
-async def get_patients_to_call(session):
+async def get_patients_to_call(s):
   """Get a list of patients we need to call."""
   api_url = os.environ['API_URL']
-  async with session.post(f"{api_url}/callNeeded") as res:
-    if res.status != 200:
-      raise ValueError(await res.text())
-    body = json.loads(await res.text())
-    return body['patients']
+  print(f"api_url {api_url}")
+  loop = asyncio.get_running_loop()
+  print("before")
+  async with aiohttp.ClientSession(loop=loop) as session:
+    print("after")
+    async with session.get(f"{api_url}/callNeeded") as res:
+      if res.status != 200:
+        raise ValueError(await res.text())
+      body = json.loads(await res.text())
+      return body['patients']
 
 async def missed_call(session, patientId):
   """notify the api about a call that wasn't answered.
@@ -35,7 +42,7 @@ async def missed_call(session, patientId):
   Returns a boolean for if the caretaker needs to be called, and the number
   to call."""
   api_url = os.environ['API_URL']
-  async with session.post(f"{api_url}/missedCall", {
+  async with session.post(f"{api_url}/missedCall", data={
     "patientID": patientId
   }) as res:
     if res.status != 200:
@@ -58,25 +65,29 @@ async def successful_call(session, patientId, startTime, endTime, complaints):
       raise ValueError(await res.text())
     body = json.loads(await res.text())
 
-async def patient_call_iteration(session):
-  patients = await get_patients_to_call(session)
+async def patient_call_iteration(ses):
+  print("patient call iter")
+  patients = await get_patients_to_call(ses)
   print(patients)
   for patient in patients:
     patient_id = patient['id']
     success = await call.call_number(patient['phone'], patient_id, patient['name'])
     # If it was a success the endpoint will call successful_call
-    if not success:
-      await missed_call(session, patient_id)
+    # if not success:
+    #   await missed_call(ses, patient_id)
 
-async def start_patient_call_loop(session):
-  while True:
-    await patient_call_iteration(session)
-    # Every ten minutes make the call.
-    await asyncio.sleep(10*60)
+async def start_patient_call_loop():
+  print("start patient call loop")
+  session = None
+  async with aiohttp.ClientSession() as session:
+    while True:
+      try:
+        await patient_call_iteration(session)
+      except Exception as err:
+        print(f"error: {err}")
+      # Every ten minutes make the call.
+      await asyncio.sleep(1*60)
 
 if __name__ == "__main__":
-  async def main():
-    async with aiohttp.ClientSession() as session:
-      patients = await get_patients_to_call(session)
-      print(patients)
-  asyncio.run(main())
+  load_dotenv()
+  start_patient_call_loop()
