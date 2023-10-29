@@ -18,6 +18,8 @@ export async function POST(request: Request) {
             error: "CareTaker not found with provided email"
         }, { status: 404 });
     }
+    console.log(careTaker);
+    console.log("hello");
 
     return NextResponse.json({ careTaker }, { status: 200 });
 }

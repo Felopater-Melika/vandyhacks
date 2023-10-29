@@ -37,22 +37,23 @@ export default function Stats() {
     return (
         <>
             <div>
-                <h2 className="text-3xl font-bold text-[#14213d] text-center mt-16 underline decoration-[#fca311]">Stats</h2>
+                <h2 className="text-3xl font-bold text-[#14213d] text-center mt-16 underline decoration-[#635dff]">Stats</h2>
                 <div className="w-[300px] sm:w-1/2 bg-[#14213d] text-center mx-auto m-4 rounded-[20px] p-8">
-                    <h3>Complaints</h3>
+                    <h3 className="text-xl text-[#e5e5e5] font-bold" >Complaints:</h3>
                     {complaints.map((complaint: any, index) => (
                         <div className="text-[#e5e5e5] m-4 text-xl" key={index}>
                             <p>{complaint.description}</p>
                         </div>
                     ))}
-                    <h3>Successful CheckIns</h3>
+
+                    <h3 className="text-xl text-[#e5e5e5] font-bold">Successful Check Ins:</h3>
                     {successfulCheckIns.map((checkin: any, index) => (
                         <div className="text-[#e5e5e5] m-4 text-xl" key={index}>
                             <p>Date: {checkin.date}</p>
                             <p>Attempt Count: {checkin.attemptCount}</p>
                         </div>
                     ))}
-                    <h3>Failed CheckIns</h3>
+                    <h3 className="text-xl text-[#e5e5e5] font-bold">Failed Check Ins:</h3>
                     {failedCheckIns.map((failCheckin: any, index) => (
                         <div className="text-[#e5e5e5] m-4 text-xl" key={index}>
                             <p>Date: {failCheckin.date}</p>
