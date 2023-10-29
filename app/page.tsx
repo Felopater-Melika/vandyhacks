@@ -6,6 +6,7 @@ import Stats from "@/components/stats";
 import {Survey} from "@/components/survey";
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import {Button} from "@/components/ui/button";
 
 
 
@@ -26,10 +27,12 @@ function Home() {
     <body className="h-auto m-16">
     {user && (
       <>
-      <div className="m-8 flex justify-end">
-        <a className="w-[120px] text-center p-4 rounded-lg text-md duration-150" href="/api/auth/logout">Logout</a>
-      </div>
-        <h1 className="text-5xl font-bold text-center m-16  underline ">ElderBytes</h1>
+        <div className="flex justify-end w-full">
+      <Button className="">
+        <a className=" text-center p-2 rounded-lg text-md" href="/api/auth/logout">Logout</a>
+      </Button>
+    </div>
+        <h1 className="text-5xl text-center m-16">ElderBytes</h1>
       {!careTaker && <Survey email={user.email ? user.email : ""}></Survey>}
       {careTaker && <Stats careTaker={careTaker}></Stats>}
       </>

@@ -9,13 +9,13 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import {Card} from "@/components/ui/card";
 
 const formSchema = z.object({
   patientName: z.string().min(2, {
@@ -66,7 +66,7 @@ export function Survey({email}: {email: string}) {
   }
 
   return (
-    <div className="w-1/2 mx-auto bg-[#635dff] p-8 rounded-[20px]">
+    <Card className="w-1/2 mx-auto  p-8 rounded-lg mb-5">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -74,13 +74,10 @@ export function Survey({email}: {email: string}) {
             name="patientName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[#14213d] text-md">Patient Name</FormLabel>
+                <FormLabel className="text-md">Patient Name</FormLabel>
                 <FormControl>
-                  <Input className="bg-[#e5e5e5]" placeholder="..." {...field} />
+                  <Input {...field} />
                 </FormControl>
-                {/* <FormDescription>
-                  This is your public display name.
-                </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
@@ -91,13 +88,10 @@ export function Survey({email}: {email: string}) {
             name="patientNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[#14213d] text-md">Patient Number</FormLabel>
+                <FormLabel className="text-md">Patient Number</FormLabel>
                 <FormControl>
-                  <Input className="bg-[#e5e5e5]" placeholder="..." {...field} />
+                  <Input {...field} />
                 </FormControl>
-                {/* <FormDescription>
-                  This is your public display name.
-                </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
@@ -108,13 +102,10 @@ export function Survey({email}: {email: string}) {
             name="careTakerName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[#14213d] text-md">Caretaker Name</FormLabel>
+                <FormLabel className="text-md">Care Taker Name</FormLabel>
                 <FormControl>
-                  <Input className="bg-[#e5e5e5]" placeholder="..." {...field} />
+                  <Input {...field} />
                 </FormControl>
-                {/* <FormDescription>
-                  This is your public display name.
-                </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
@@ -125,13 +116,10 @@ export function Survey({email}: {email: string}) {
             name="careTakerNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[#14213d] text-md">Caretaker Number</FormLabel>
+                <FormLabel className="text-md">Care Taker Number</FormLabel>
                 <FormControl>
-                  <Input className="bg-[#e5e5e5]" placeholder="..." {...field} />
+                  <Input {...field} />
                 </FormControl>
-                {/* <FormDescription>
-                  This is your public display name.
-                </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
@@ -141,13 +129,10 @@ export function Survey({email}: {email: string}) {
                 name="careTakerEmail"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel className="text-[#14213d] text-md">Caretaker Email</FormLabel>
+                        <FormLabel className="text-md">Caretaker Email</FormLabel>
                         <FormControl>
-                            <Input className="bg-[#e5e5e5]" placeholder={email}  {...field} />
+                            <Input  {...field} />
                         </FormControl>
-                        {/* <FormDescription>
-                  This is your public display name.
-                </FormDescription> */}
                         <FormMessage />
                     </FormItem>
                 )}
@@ -157,6 +142,6 @@ export function Survey({email}: {email: string}) {
           </div>
         </form>
       </Form>
-    </div>
+    </Card>
   )
 }
