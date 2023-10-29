@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.2.0",
-    "@prisma/client": "4.13.0",
     "@hookform/resolvers": "^3.3.2",
+    "@prisma/client": "4.13.0",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
     "axios": "^1.6.0",
@@ -19,6 +19,7 @@
     "clsx": "^2.0.0",
     "lucide-react": "^0.290.0",
     "next": "14.0.0",
+    "next-themes": "^0.2.1",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.47.0",

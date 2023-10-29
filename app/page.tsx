@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 
+
 function Home() {
   const { user } = useUser();
   const [careTaker, setCareTaker] = useState<any>(null);
@@ -22,13 +23,13 @@ function Home() {
 
   return (
     <>
-    <body className="bg-[#e5e5e5] h-[150vh]">
+    <body className="h-auto m-16">
     {user && (
       <>
       <div className="m-8 flex justify-end">
-        <a className="w-[120px] bg-[#14213d] text-[#e5e5e5] text-center p-4 rounded-lg text-md hover:bg-[#635dff] hover:text-[#14213d] duration-150" href="/api/auth/logout">Logout</a>
+        <a className="w-[120px] text-center p-4 rounded-lg text-md duration-150" href="/api/auth/logout">Logout</a>
       </div>
-        <h1 className="text-5xl font-bold text-center m-16 text-[#14213d] underline decoration-[#635dff]">ElderBytes</h1>
+        <h1 className="text-5xl font-bold text-center m-16  underline ">ElderBytes</h1>
       {!careTaker && <Survey email={user.email ? user.email : ""}></Survey>}
       {careTaker && <Stats careTaker={careTaker}></Stats>}
       </>

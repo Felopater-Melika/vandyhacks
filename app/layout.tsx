@@ -5,6 +5,7 @@ import './globals.css'
 import { Inter as FontSans } from "next/font/google"
 import {cn} from "@/lib/utils";
 import { UserProvider } from "@auth0/nextjs-auth0/client"
+import { ThemeProvider } from "@/components/theme-provider"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -24,7 +25,14 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        <UserProvider>{children}</UserProvider>
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <UserProvider>{children}</UserProvider>
+          </ThemeProvider>
       </body>
     </html>
   )
