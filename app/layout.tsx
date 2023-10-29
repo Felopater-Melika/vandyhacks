@@ -1,6 +1,5 @@
 'use client'
 
-import type { Metadata } from 'next'
 import './globals.css'
 import { Inter as FontSans } from "next/font/google"
 import {cn} from "@/lib/utils";
