@@ -1,8 +1,6 @@
 'use client';
 
 import 'app/globals.css';
-
-import React from 'react';
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import Stats from "@/components/stats";
 import {Survey} from "@/components/survey";
@@ -32,7 +30,7 @@ function Home() {
       </div>
         <h1 className="text-5xl font-bold text-center m-16 text-[#14213d] underline decoration-[#635dff]">ElderBytes</h1>
       {!careTaker && <Survey email={user.email ? user.email : ""}></Survey>}
-        <Stats></Stats>
+      {careTaker && <Stats careTaker={careTaker}></Stats>}
       </>
     )}
     </body>

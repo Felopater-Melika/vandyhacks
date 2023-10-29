@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import axios from "axios";
 
-export default function Stats() {
+export default function Stats({careTaker}: any) {
     const [complaints, setComplaints] = useState([]);
     const [successfulCheckIns, setSuccessfulCheckIns] = useState([]);
     const [failedCheckIns, setFailedCheckIns] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    console.log("Patient ID:" + localStorage.getItem('patientId'));
-    console.log("CareTaker ID:" + localStorage.getItem('careTakerId'));
 
     useEffect(() => {
         async function fetchData() {
             try {
                 const response = await axios.post('/api/careTaker', {
-                    patientId: localStorage.getItem('patientId')
+                    patientId: careTaker.patientId
                 });
 
                 console.log("Response:", response.data);
