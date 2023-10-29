@@ -46,6 +46,10 @@ export function Survey() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     axios.post('api/registration', values)
     .then((response) => {
+        localStorage.setItem('patientId', response.data.patient.id);
+        localStorage.setItem('careTakerId', response.data.careTaker.id);
+        console.log(localStorage.getItem('patientId'));
+        console.log(localStorage.getItem('careTakerId'));
       console.log('Form submitted successfully', response.data);
     })
     .catch((error) => {

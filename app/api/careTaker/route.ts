@@ -43,6 +43,7 @@ export async function POST(request: Request) {
         console.log("Complaints:", complaints);
         console.log("Successful CheckIns:", successfulCheckIns);
         console.log("Failed CheckIns:", failedCheckIns);
+
         return NextResponse.json({ complaints, successfulCheckIns, failedCheckIns }, { status: 200 });
 
     } catch (error) {
