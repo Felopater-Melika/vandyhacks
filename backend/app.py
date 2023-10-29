@@ -77,8 +77,18 @@ async def call_socket():
     async def write_to_socket(raw):
       print("write_to_socket start")
       # audio = audioop.lin2ulaw(raw, 2)
-      audio = raw
-      encoded = str(base64.b64encode(audio))
+      # header_end_index = raw.find(bytes([64, 61, 74, 61]))
+      # print(f"header end {header_end_index}")
+      print(raw[0:4].decode())
+      data_section = raw.find(bytes("data", 'utf-8'))
+      print(f"data section {data_section}")
+      if data_section != -1:
+        audio = raw[data_section+8:]
+      else:
+        audio = raw
+      print(f"channels: {raw[23:25]}")
+      encoded = base64.b64encode(audio).decode('utf-8')
+      print(encoded)
       json_str = json.dumps({
         "event": "media",
         "streamSid":stream_sid,
@@ -90,8 +100,17 @@ async def call_socket():
 
     async def send_msg(msg):
       print("send msg start")
-      audio_data = await synth_speech(msg)
-      await write_to_socket(audio_data)
+      if msg != '':
+        audio_data = await synth_speech(msg)
+        await write_to_socket(audio_data)
+        await websocket.send(json.dumps({
+          "event":"mark",
+          "streamSid":stream_sid,
+          "mark":{
+            "name":"send_mark",
+          },
+        }))
+        print('end write_to_socket')
       # audio_data = await asyncio.to_thread(generate_speech, msg)
       #await write_to_socket(audio_data)
 

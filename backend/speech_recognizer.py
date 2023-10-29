@@ -17,21 +17,26 @@ async def synth_speech(msg):
   input = texttospeech_v1.SynthesisInput()
   input.text = msg
 
+  print("setup input")
   voice = texttospeech_v1.VoiceSelectionParams()
   voice.language_code = "en-US"
+  print("setup voice")
 
   audio_config = texttospeech_v1.AudioConfig()
   audio_config.audio_encoding = "MULAW"
   audio_config.sample_rate_hertz = 8000
+  print("setup audio")
 
   request = texttospeech_v1.SynthesizeSpeechRequest(
     input=input,
     voice=voice,
     audio_config=audio_config,
   )
+  print("setup request")
 
   # Make the request
   response = await client.synthesize_speech(request=request)
+  print("got response")
 
   # Handle the response
   return response.audio_content

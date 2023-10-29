@@ -18,16 +18,6 @@ def build_client():
   return client
 base_url = os.environ.get('BASE_URL', "4a2e-129-59-122-134.ngrok-free.app")
 
-def make_respond(msg):
-  res = VoiceResponse()
-  if msg is None:
-    res.pause(length=1)
-  else:
-    res.say(msg)
-  res.redirect(f'https://{base_url}/twilio/respond', method='POST')
-  print(f"make response {msg}")
-  return str(res)
-
 async def call_number(number):
   client = build_client()
   response = VoiceResponse()
