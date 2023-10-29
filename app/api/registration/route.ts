@@ -30,7 +30,6 @@ export async function POST(request: Request) {
             }
         })
 
-
         return NextResponse.json({ careTaker, patient }, { status: 200 });
 
     } catch (error) {
