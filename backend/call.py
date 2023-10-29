@@ -6,27 +6,43 @@ from twilio.rest import Client
 from twilio.twiml.voice_response import VoiceResponse, Connect, Start
 from twilio.http.async_http_client import AsyncTwilioHttpClient
 
-dotenv.load_dotenv()
+twilio_http = AsyncTwilioHttpClient() 
 
-account_sid = os.environ['TWILIO_ACCOUNT_SID']
-auth_token = os.environ['TWILIO_AUTH_TOKEN']
 def build_client():
+  account_sid = os.environ['TWILIO_ACCOUNT_SID']
+  auth_token = os.environ['TWILIO_AUTH_TOKEN']
   logging.basicConfig()
-  twilio_http = AsyncTwilioHttpClient() 
   client = Client(account_sid, auth_token, http_client=twilio_http)
   twilio_http.logger.setLevel(logging.INFO)
   return client
 base_url = os.environ.get('BASE_URL', "4a2e-129-59-122-134.ngrok-free.app")
 
-async def call_number(number):
+async def call_caretaker(number, patientName):
+  client = build_client()
+  res = VoiceResponse()
+  res.say(f"""
+This is Max, the automatic wellness check in service. We're calling you to
+inform you that we haven't been able to get ahold of {patientName} after calling
+three times. You may want to check in on them to make sure that they're okay.
+""")
+  created = await client.calls.create_async(
+    twiml=res,
+    to=number,
+    from_='+18559767970'
+  )
+  print(created)
+
+async def call_number(number, patientId, patientName):
   client = build_client()
   response = VoiceResponse()
   connect = Connect()
-  connect.stream(
+  stream = connect.stream(
     # name='Conversation', # needs to be unique
     # track='both_tracks',
     url=f'wss://{base_url}/twilio/call_stream'
   )
+  stream.parameter(name="patientId", value=patientId)
+  stream.parameter(name="patientName", value=patientName)
   # response.pause(60)
   # response.say("HELLO WORLD!")
   response.say("hello")
@@ -37,10 +53,11 @@ async def call_number(number):
     to=number,
     from_='+18559767970'
   )
-  print(create_res)
+  print(f"call status: {create_res['status']}")
+  return create_res['status'] == 'completed'
 
 if __name__ == "__main__":
+  dotenv.load_dotenv()
   async def main():
-    await call_number('+16156179292')
-    await asyncio.sleep(10)
+    await call_caretaker('+16156179292', 'Brandon Peters')
   asyncio.run(main())

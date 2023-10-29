@@ -29,6 +29,7 @@
         name="env";
         targetPkgs = p: with p; [
           # openssl
+          sqlite
           google-cloud-sdk
           ngrok
           python311

@@ -4,19 +4,30 @@ import dotenv
 import json
 import audioop
 import base64
+import aiohttp
+from datetime import datetime
 from quart import Quart, request, websocket
-from quart import copy_current_websocket_context
+from quart import copy_current_websocket_context, copy_current_app_context
 from speech_recognizer import start_audio_recognizer, synth_speech
 import call
+import ai
+import api
 
 dotenv.load_dotenv()
 
 app = Quart(__name__)
 
+@app.before_serving
+async def startup():
+  # TODO: write a handler to call app.client.close() when app ends
+  session = aiohttp.ClientSession()
+  app.client = session
+  asyncio.create_task(api.start_patient_call_loop(session))
+
 # I'm going to need some way to say "hey it's been x amount of time since
 # speech was recognized"
 
-async def respond_to_packet(push_stream, write):
+async def respond_to_packet(push_stream, patient_id, start_time):
   while True:
     message = await websocket.receive()
     packet = json.loads(message)
@@ -27,27 +38,26 @@ async def respond_to_packet(push_stream, write):
       audio = base64.b64decode(packet['media']['payload'])
       audio = audioop.ulaw2lin(audio, 2)
       audio = audioop.ratecv(audio, 2, 1, 8000, 16000, None)[0]
-      # json_str = json.dumps({
-      #   "event": "media",
-      #   "streamSid":packet['streamSid'],
-      #   "media":{
-      #     "payload":packet['media']['payload']
-      #   },
-      # })
-      # await websocket.send(json_str)
       push_stream.write(audio)
-      # print("wrote message to audio")
-    # else:
-      # raise ValueError(f"unknown event {packet['event']}")
+    elif packet['event'] == 'stop':
+      end_time = datetime.now()
+      complaint = await generate_report(patient_id)
+      await api.successful_call(app.client, patient_id, start_time,
+        end_time, [complaint])
 
 async def wait_for_start():
-  """returns callSid"""
+  """returns streamSid, callSid, patientId"""
   while True:
     msg = await websocket.receive()
     packet = json.loads(msg)
     print(packet['event'])
     if packet['event'] == 'start':
-      return packet['start']['streamSid'], packet['start']['callSid']
+      stream_sid = packet['start']['streamSid']
+      call_sid = packet['start']['callSid']
+      params = packet['start']['customParameters']
+      patient_id = params['patientId']
+      patient_name = params['patientName']
+      return stream_sid, call_sid, patient_id, patient_name
 
 # Encode audio for twilio:
 # https://www.twilio.com/docs/voice/twiml/stream#message-media-to-twilio
@@ -71,9 +81,11 @@ async def redirect():
 async def call_socket():
   try:
     print("recieved websocket thing")
-    stream_sid, call_sid = await wait_for_start()
-    print("recieved first message", call_sid)
-    @copy_current_websocket_context
+    stream_sid, call_sid, patient_id, patient_name = await wait_for_start()
+    start_time = datetime.now()
+    print("recieved first message", call_sid, "at", start_time)
+
+    # @copy_current_websocket_context
     async def write_to_socket(raw):
       print("write_to_socket start")
       # audio = audioop.lin2ulaw(raw, 2)
@@ -98,19 +110,25 @@ async def call_socket():
       })
       await websocket.send(json_str)
 
+    @copy_current_websocket_context
     async def send_msg(msg):
-      print("send msg start")
-      if msg != '':
-        audio_data = await synth_speech(msg)
-        await write_to_socket(audio_data)
-        await websocket.send(json.dumps({
-          "event":"mark",
-          "streamSid":stream_sid,
-          "mark":{
-            "name":"send_mark",
-          },
-        }))
-        print('end write_to_socket')
+      try:
+        print("send msg start")
+        if msg != '':
+          res = await ai.process_response(msg, 'einar')
+          print(f"GOT AI response! {res}")
+          audio_data = await synth_speech(res)
+          await write_to_socket(audio_data)
+          await websocket.send(json.dumps({
+            "event":"mark",
+            "streamSid":stream_sid,
+            "mark":{
+              "name":"send_mark",
+            },
+          }))
+          print('end write_to_socket')
+      except Exception as err:
+        print(f"send_msg error: {err}")
       # audio_data = await asyncio.to_thread(generate_speech, msg)
       #await write_to_socket(audio_data)
 
@@ -118,13 +136,14 @@ async def call_socket():
     await asyncio.sleep(0)
 
     print("started audio recognizer")
-    await asyncio.create_task(respond_to_packet(push_stream, write_to_socket))
+    await asyncio.create_task(respond_to_packet(push_stream,
+      patient_id, start_time))
   except asyncio.CancelledError:
     # Handle here
     print("socket disconnected")
     raise
 
-@app.route("/api/make_call")
+@app.route("/call_api/make_call")
 async def start_call():
   await call.call_number("+16156179292")
   return "Called!"
