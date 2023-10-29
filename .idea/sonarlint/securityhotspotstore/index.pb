@@ -48,3 +48,5 @@ S
 :
 
 flake.lock,7/0/70cb1899c3b75c56c8f833c2b42e5b47d222dc8b
+F
+components/ui/card.tsx,7/9/79f0a50bd3f074b5392c67c55d393d0a58a09656

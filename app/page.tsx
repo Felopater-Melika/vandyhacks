@@ -7,6 +7,7 @@ import {Survey} from "@/components/survey";
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import {Button} from "@/components/ui/button";
+import Chat from "@/components/chat";
 
 
 
@@ -35,6 +36,7 @@ function Home() {
         <h1 className="text-5xl text-center m-16">ElderBytes</h1>
       {!careTaker && <Survey email={user.email ? user.email : ""}></Survey>}
       {careTaker && <Stats careTaker={careTaker}></Stats>}
+        {careTaker && <Chat />}
       </>
     )}
     </body>
