@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import axios from 'axios';
 
 import { Button } from "@/components/ui/button"
 import {
@@ -45,13 +46,19 @@ export function Survey() {
  
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
+    // axios.post('/registration', values)
+    // .then((response) => {
+    //   console.log('Form submitted successfully', response.data);
+    // })
+    // .catch((error) => {
+    //   console.error('Form submission failed', error);
+    // });
+
     console.log(values)
   }
 
   return (
-    <div className="w-1/2 mx-auto bg-[#fca311] p-8 rounded-[20px]">
+    <div className="w-1/2 mx-auto bg-[#635dff] p-8 rounded-[20px]">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
