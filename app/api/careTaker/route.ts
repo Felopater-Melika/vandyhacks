@@ -5,8 +5,8 @@ const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
     try {
-        const patientId = await request.json();
-
+        const {patientId} = await request.json();
+        console.log("Patient ID:", patientId)
         if (!patientId) {
             return NextResponse.json({ message: "Patient ID is required" }, { status: 400 });
         }
@@ -40,6 +40,9 @@ export async function POST(request: Request) {
             }
         });
 
+        console.log("Complaints:", complaints);
+        console.log("Successful CheckIns:", successfulCheckIns);
+        console.log("Failed CheckIns:", failedCheckIns);
         return NextResponse.json({ complaints, successfulCheckIns, failedCheckIns }, { status: 200 });
 
     } catch (error) {

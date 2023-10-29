@@ -24,35 +24,33 @@ const formSchema = z.object({
   patientNumber: z.string().regex(/^\d+$/, {
     message: 'Patient number must contain only digits.',
   }),
-  caretakerName: z.string().min(2, {
+  careTakerName: z.string().min(2, {
     message: 'Caretaker name must be at least 2 characters.',
   }),
-  caretakerNumber: z.string().regex(/^\d+$/, {
+  careTakerNumber: z.string().regex(/^\d+$/, {
     message: 'Caretaker number must contain only digits.',
   }),
 });
 
 export function Survey() {
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       patientName: "",
       patientNumber: "",
-      caretakerName: "",
-      caretakerNumber: "",
+      careTakerName: "",
+      careTakerNumber: "",
     },
   })
  
-  // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // axios.post('/registration', values)
-    // .then((response) => {
-    //   console.log('Form submitted successfully', response.data);
-    // })
-    // .catch((error) => {
-    //   console.error('Form submission failed', error);
-    // });
+    axios.post('api/registration', values)
+    .then((response) => {
+      console.log('Form submitted successfully', response.data);
+    })
+    .catch((error) => {
+      console.error('Form submission failed', error);
+    });
 
     console.log(values)
   }
@@ -97,7 +95,7 @@ export function Survey() {
 
           <FormField
             control={form.control}
-            name="caretakerName"
+            name="careTakerName"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-[#14213d] text-md">Caretaker Name</FormLabel>
@@ -114,7 +112,7 @@ export function Survey() {
 
           <FormField
             control={form.control}
-            name="caretakerNumber"
+            name="careTakerNumber"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-[#14213d] text-md">Caretaker Number</FormLabel>

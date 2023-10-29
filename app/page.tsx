@@ -1,16 +1,15 @@
 'use client';
 
-import { Survey } from "@/components/ui/survey";
 import 'app/globals.css';
-import Stats from "app/stats";
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { getAccessToken } from '@auth0/nextjs-auth0';
+
+import React from 'react';
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import Stats from "@/components/stats";
+import {Survey} from "@/components/survey";
 
 
 function Home() {
-  const { user, isLoading } = useUser();
+  const { user } = useUser();
   
   return (
     <>
@@ -31,5 +30,5 @@ function Home() {
 };
 
 export default withPageAuthRequired(Home, {
-  onError: error => <ErrorMessage>{error.message}</ErrorMessage>
+  onError: error => <div>{error.message}</div>,
 });
