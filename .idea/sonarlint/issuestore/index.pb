@@ -27,3 +27,13 @@ M
 .env.local,1/f/1fa30fea3e9ae270a3c38a6113a3689d8987d108
 M
 app/api/registration/route.ts,4/e/4e485bdfbcad39438ef3ec1407555d9082292d1c
+J
+app/api/careTaker/route.ts,6/3/63d056b8cbc64013aee84ccfc8352805cb6d9d7d
+D
+components/stats.tsx,d/b/dbd05d6588a191330415a7ffb0b658d75bfa809a
+>
+next.config.js,8/1/811a6d5a2e04fadb44d8eec365f2fa8af5c4facf
+E
+components/survey.tsx,3/d/3d7f7c722df3cd797423bbc13d189565ebf5d511
+I
+app/api/retrieve/route.ts,d/5/d5f26d4a6bc6d239c53c0311b883101c2b2456d2

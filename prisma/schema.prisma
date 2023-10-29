@@ -43,7 +43,9 @@ model CareTaker {
   patient   Patient?
   name      String // Care taker's name
   phone     String // Care taker's phone number
+  email     String // Care taker's email address
 
+  @@unique([email])
   @@unique([patientId])
 }
 
