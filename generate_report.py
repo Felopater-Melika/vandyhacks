@@ -8,7 +8,7 @@ from langchain.utilities import GoogleSearchAPIWrapper
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferWindowMemory
 
-def process_response(human_input, user_id):
+def generate_report(human_input, user_id):
     chat_message_history = SQLChatMessageHistory(
         session_id=user_id,
         connection_string='sqlite:///sqlite.db'
@@ -18,9 +18,11 @@ def process_response(human_input, user_id):
         memory_key="chat_history", chat_memory=chat_message_history
     )
 
-    template = """Healthcare Assistant is designed to be able to assist an elder with various tasks, especially those related to health concerns.
+    template = """
+    Chat history between the elderly user and the AI Healthcare Assistant:
     {chat_history}
-    Human: {human_input}
+    Now, based on the text of the most recent chat below, describe any imminent or potential health issues the elderly user mentioned. Please be SURE to note that the below chat is also in the chat history above as the last entry so do not consider it twice. If the elder reports a problem that has been mentioned in past chats and there is pertinent information from those past chats, then say so. If there are no problems with their health, say that there are no problems with their health. Be accurate and specific! 
+    Chat: {human_input}
     Healthcare Assistant:"""
 
     prompt = PromptTemplate(input_variables=["human_input"], template=template)
@@ -30,7 +32,7 @@ def process_response(human_input, user_id):
         llm=OpenAI(temperature=0, openai_api_key=""),
         prompt=prompt,
         verbose=True,
-        memory=memory, # ConversationBufferWindowMemory(k=10)
+        memory=memory, 
     )
 
     # print(chat_message_history.messages)
@@ -40,7 +42,7 @@ def process_response(human_input, user_id):
     return output
 
 # Example run: 
-user_input = "What is my name?"
+recent_chat = "What is my name again?"
 session_id = '0000'
-result = process_response(user_input, session_id)
+result = generate_report(recent_chat, session_id)
 print(result)
