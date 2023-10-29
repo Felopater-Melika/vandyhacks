@@ -41,7 +41,8 @@ model CareTaker {
   id        Int      @id @default(autoincrement()) // Unique identifier for each care taker
   patientId Int? // Foreign key linking to a patient (made optional)
   patient   Patient?
-  sessionId String // Auth session ID
+  name      String // Care taker's name
+  phone     String // Care taker's phone number
 
   @@unique([patientId])
 }
