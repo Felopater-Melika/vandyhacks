@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import axios from 'axios';
 
 import { Button } from "@/components/ui/button"
 import {
@@ -45,13 +46,19 @@ export function Survey() {
  
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
+    // axios.post('/registration', values)
+    // .then((response) => {
+    //   console.log('Form submitted successfully', response.data);
+    // })
+    // .catch((error) => {
+    //   console.error('Form submission failed', error);
+    // });
+
     console.log(values)
   }
 
   return (
-    <div className="w-1/2 mx-auto">
+    <div className="w-1/2 mx-auto bg-[#635dff] p-8 rounded-[20px]">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -59,9 +66,9 @@ export function Survey() {
             name="patientName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[#14213d] text-lg">Patient Name</FormLabel>
+                <FormLabel className="text-[#14213d] text-md">Patient Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="..." {...field} />
+                  <Input className="bg-[#e5e5e5]" placeholder="..." {...field} />
                 </FormControl>
                 {/* <FormDescription>
                   This is your public display name.
@@ -76,9 +83,9 @@ export function Survey() {
             name="patientNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[#14213d] text-lg">Patient Number</FormLabel>
+                <FormLabel className="text-[#14213d] text-md">Patient Number</FormLabel>
                 <FormControl>
-                  <Input placeholder="..." {...field} />
+                  <Input className="bg-[#e5e5e5]" placeholder="..." {...field} />
                 </FormControl>
                 {/* <FormDescription>
                   This is your public display name.
@@ -93,9 +100,9 @@ export function Survey() {
             name="caretakerName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[#14213d] text-lg">Caretaker Name</FormLabel>
+                <FormLabel className="text-[#14213d] text-md">Caretaker Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="..." {...field} />
+                  <Input className="bg-[#e5e5e5]" placeholder="..." {...field} />
                 </FormControl>
                 {/* <FormDescription>
                   This is your public display name.
@@ -110,9 +117,9 @@ export function Survey() {
             name="caretakerNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[#14213d] text-lg">Caretaker Number</FormLabel>
+                <FormLabel className="text-[#14213d] text-md">Caretaker Number</FormLabel>
                 <FormControl>
-                  <Input placeholder="..." {...field} />
+                  <Input className="bg-[#e5e5e5]" placeholder="..." {...field} />
                 </FormControl>
                 {/* <FormDescription>
                   This is your public display name.
@@ -122,7 +129,7 @@ export function Survey() {
             )}
           />    
           <div className="flex justify-center">
-            <Button type="submit" className="mx-auto w-32 hover:bg-[#fca311] bg-[#14213d]">Submit</Button>
+            <Button type="submit" className="mx-auto w-32 text-[#14213d] hover:bg-[#14213d] hover:text-[#e5e5e5] bg-[#e5e5e5]">Submit</Button>
           </div>
         </form>
       </Form>
