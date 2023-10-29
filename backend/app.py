@@ -31,19 +31,17 @@ async def respond_to_packet(push_stream, patient_id, start_time):
     packet = json.loads(message)
     # print("recieved new message")
     if packet['event'] == 'stop':
-      print("Call audio streaming stopped")
-    elif packet['event'] == 'media' and packet['media']['track'] == 'inbound':
-      audio = base64.b64decode(packet['media']['payload'])
-      audio = audioop.ulaw2lin(audio, 2)
-      audio = audioop.ratecv(audio, 2, 1, 8000, 16000, None)[0]
-      push_stream.write(audio)
-    elif packet['event'] == 'stop':
       end_time = datetime.now()
       print("end of call")
       complaint = await generate_report(patient_id)
       print(f"complaint: {complaint}")
       await api.successful_call(app.client, patient_id, start_time,
         end_time, [complaint])
+    elif packet['event'] == 'media' and packet['media']['track'] == 'inbound':
+      audio = base64.b64decode(packet['media']['payload'])
+      audio = audioop.ulaw2lin(audio, 2)
+      audio = audioop.ratecv(audio, 2, 1, 8000, 16000, None)[0]
+      push_stream.write(audio)
 
 async def wait_for_start():
   """returns streamSid, callSid, patientId"""
