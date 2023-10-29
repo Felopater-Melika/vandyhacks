@@ -15,16 +15,17 @@ import {ScrollArea} from "@/components/ui/scroll-area";
 type FormData = {
     chatInput: string;
 };
-const URL = "ws://localhost:5000";  // WebSocket URL
+const URL = "ws://localhost:8000";  // WebSocket URL
 
-// Setup WebSocket outside of React components
-const socket = new WebSocket(URL);
 
 function useSocket(setIsSending: React.Dispatch<React.SetStateAction<boolean>>) {
     const [transcript, setTranscript] = useState<string[]>([]);
     const [isConnected, setIsConnected] = useState(false);
 
     useEffect(() => {
+        /*/ Setup WebSocket outside of React components
+        const socket = new WebSocket(URL);
+
         socket.onopen = () => {
             setIsConnected(true);
         }
@@ -43,7 +44,7 @@ function useSocket(setIsSending: React.Dispatch<React.SetStateAction<boolean>>) 
 
         return () => {
             socket.close();
-        }
+        }*/
     }, []);
 
     return [isConnected, transcript, setTranscript];

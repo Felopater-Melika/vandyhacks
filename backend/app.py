@@ -148,5 +148,11 @@ async def start_call():
   await call.call_number("+16156179292")
   return "Called!"
 
+@app.route("/call_api/make_checkins")
+async def make_checkins():
+  await api.create_day_checkins(api.client)
+
+
+
 if __name__ == "__main__":
   app.run(debug=True,port=8000)
