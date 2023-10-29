@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export async function POST(request: Request) {
     try {
         const { patientName, patientNumber, careTakerName, careTakerNumber } = await request.json();
-        const patient = await prisma.patient.create({
+        let patient = await prisma.patient.create({
             data: {
                 name: patientName,
                 phone: patientNumber,
@@ -19,6 +19,15 @@ export async function POST(request: Request) {
                 phone: careTakerNumber,
                 patientId: patient.id
             },
+        })
+
+        patient = await prisma.patient.update({
+            where: {
+                id: patient.id
+            },
+            data: {
+                careTakerId: careTaker.id
+            }
         })
 
 
