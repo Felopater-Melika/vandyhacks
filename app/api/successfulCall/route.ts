@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { parseISO } from 'date-fns'; // You can use 'date-fns' for parsing dates
+import dayjs from 'dayjs';
 
 const prisma = new PrismaClient();
 
@@ -8,7 +8,6 @@ export async function POST(request: Request) {
     try {
         const { patientId, startTime, endTime, complaints } = await request.json();
 
-        // Find the patient by patientId
         const patient = await prisma.patient.findUnique({
             where: {
                 id: patientId,
@@ -19,16 +18,14 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Patient not found' }, { status: 404 });
         }
 
-        // Create a new Call and associate it with the patient
         const call = await prisma.call.create({
             data: {
                 patientId: patientId,
-                startTime: parseISO(startTime), // Parse ISO date strings to DateTime
-                endTime: parseISO(endTime),
+                startTime: dayjs(startTime).toDate(),
+                endTime: dayjs(endTime).toDate(),
             },
         });
 
-        // Create Complaints associated with the Call
         if (complaints && complaints.length > 0) {
             const complaintsData = complaints.map((complaint: string) => {
                 return {
@@ -38,11 +35,11 @@ export async function POST(request: Request) {
                 };
             });
 
-            const createdComplaints = await prisma.complaint.createMany({
-                data: complaintsData,
-            });
-
-            call.complaints = createdComplaints;
+            for (let complaintData of complaintsData) {
+                await prisma.complaint.create({
+                    data: complaintData,
+                });
+            }
         }
 
         return NextResponse.json({ call }, { status: 200 });

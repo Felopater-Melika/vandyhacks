@@ -5,61 +5,66 @@ const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
     try {
-        const MAX_ATTEMPTS = 3; // Define the maximum number of attempts
+        const MAX_ATTEMPTS = 3;
 
-        const { patientID } = await request.json(); // Get the patientID from the request body
+        const { patientID } = await request.json();
 
-        // Find the patient by patientID
-        const patient = await prisma.patient.findUnique({
+        // Find the patient's latest checkin
+        const checkin = await prisma.checkin.findFirst({
             where: {
-                id: patientID,
+                patientId: patientID
             },
+            orderBy: {
+                date: 'desc'
+            }
         });
 
-        if (!patient) {
-            return NextResponse.json({ error: "Patient not found" }, { status: 404 });
+        if (!checkin) {
+            return NextResponse.json({ error: "Checkin not found" }, { status: 404 });
         }
 
-        // Check if the patient has already reached the maximum attempts
-        if (patient.attemptCount == MAX_ATTEMPTS) {
-            // Log a failed check-in
+        // Check if the checkin has already reached the maximum attempts
+        if (checkin.attemptCount === MAX_ATTEMPTS) {
             const failedCheckin = await prisma.failCheckin.create({
-
-                //need to get rest of the data*******
-
                 data: {
-
                     patientId: patientID,
                     date: new Date(),
-                    reachedCareTaker: null, // Set reachedCareTaker to null
+                    reachedCareTaker: false, // Change this to a Boolean value.
+                                             // You may later update it once the caretaker is reached.
+                }
+            });
 
+            const patient = await prisma.patient.findUnique({
+                where: {
+                    id: patientID
                 },
+                include: {
+                    careTaker: true
+                }
             });
 
             return NextResponse.json({
-                callCaretaker: true, // Indicate to call the caretaker
-                caretakerNumber: patient.careTaker?.phone || null, // Provide the caretaker's number
-                
+                callCaretaker: true,
+                caretakerNumber: patient?.careTaker?.phone || null,
             }, { status: 200 });
         }
 
-        // Increment the attempt count for the patient
-        await prisma.patient.update({
+        // Increment the attempt count for the checkin
+        await prisma.checkin.update({
             where: {
-                id: patientID,
+                id: checkin.id
             },
             data: {
-                attemptCount: patient.attemptCount + 1,
+                attemptCount: checkin.attemptCount + 1,
             },
         });
 
         return NextResponse.json({
-            callCaretaker: false, // Indicate not to call the caretaker
-            caretakerNumber: null, // No need to provide the caretaker's number
+            callCaretaker: false,
         }, { status: 200 });
 
     } catch (error) {
-        console.error("Error updating patient's attempt count:", error);
+        console.error("Error updating checkin's attempt count:", error);
         return NextResponse.json({ message: "Error updating attempt count" }, { status: 500 });
     } finally {
         await prisma.$disconnect();
