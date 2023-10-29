@@ -23,30 +23,32 @@ export async function POST(request: Request) {
         const call = await prisma.Call.create({
             data: {
                 patientId: patientId,
+                patient: patient,
                 startTime: parseISO(startTime), // Parse ISO date strings to DateTime
                 endTime: parseISO(endTime),
             },
         });
 
-        // Create Messages associated with the Call
+        // Create Complaints associated with the Call
         if (complaints && complaints.length > 0) {
-            const messages = await Promise.all(
-                complaints.map((complaint:any) => {
-                    return prisma.Message.create({
-                        data: {
-                            speaker: 'Patient', // Assuming the speaker is the patient
-                            message: complaint,
-                            callId: call.id,
-                        },
-                    });
-                })
-            );
-            call.messages = messages;
+            const complaintsData = complaints.map((complaint: string) => {
+                return {
+                    description: complaint,
+                    patientId: patientId,
+                    callId: call.id,
+                };
+            });
+
+            const createdComplaints = await prisma.Complaint.createMany({
+                data: complaintsData,
+            });
+
+            call.complaints = createdComplaints;
         }
 
         return NextResponse.json({ call }, { status: 200 });
     } catch (error) {
-        console.error('Error creating call and messages:', error);
+        console.error('Error creating call and complaints:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     } finally {
         await prisma.$disconnect();

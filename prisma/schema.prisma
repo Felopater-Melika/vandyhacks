@@ -16,6 +16,8 @@ model Complaint {
   description String // Description of the complaint
   patientId   Int // Foreign key linking to a patient in the Patients table
   patient     Patient @relation(fields: [patientId], references: [id])
+  callId  Int  // Foreign key linking to a call
+  call    Call @relation(fields: [callId], references: [id]) // Add a relation to one Call
 
   // @@index([patientId], name: "idx_complaints_patient")
 }
@@ -52,11 +54,11 @@ model CareTaker {
 // Calls table
 model Call {
   id        Int       @id @default(autoincrement()) // Unique identifier for each call
-  patientId Int // Foreign key linking to a patient
+  patientId Int       // Foreign key linking to a patient
   patient   Patient   @relation(fields: [patientId], references: [id])
-  startTime DateTime // Start time of the call
-  endTime   DateTime // End time of the call
-  messages  Message[] // Relation to Messages
+  startTime DateTime  // Start time of the call
+  endTime   DateTime  // End time of the call
+  complaints Complaint[] // Add a relation to multiple Complaints
 
   // @@index([patientId], name: "idx_calls_patient")
 }
@@ -84,14 +86,14 @@ model FailCheckin {
   // @@index([patientId], name: "idx_failcheckins_patient")
 }
 
-// Messages table
-model Message {
-  id      Int    @id @default(autoincrement()) // Unique identifier for each message
-  speaker String // Speaker during the call
-  message String // Message content
-  callId  Int // Foreign key linking to a call
-  call    Call   @relation(fields: [callId], references: [id])
+// // Messages table
+// model Message {
+//   id      Int    @id @default(autoincrement()) // Unique identifier for each message
+//   speaker String // Speaker during the call
+//   message String // Message content
+//   callId  Int // Foreign key linking to a call
+//   call    Call   @relation(fields: [callId], references: [id])
 
-  // @@index([callId], name: "idx_messages_call")
-  @@unique([callId])
-}
+//   // @@index([callId], name: "idx_messages_call")
+//   @@unique([callId])
+// }

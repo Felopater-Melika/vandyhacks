@@ -35,7 +35,7 @@ export async function POST() {
                     data: {
                         patientId: patient.id,
                         date: currentDate.toDate(), // Convert dayjs to Date object
-                        attemptCount: 1,
+                        attemptCount: 0,
                         nextAttemptTime,
                     },
                 });

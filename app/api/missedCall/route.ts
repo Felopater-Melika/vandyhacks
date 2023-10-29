@@ -21,7 +21,7 @@ export async function POST(request: Request) {
         }
 
         // Check if the patient has already reached the maximum attempts
-        if (patient.attemptCount >= MAX_ATTEMPTS) {
+        if (patient.attemptCount == MAX_ATTEMPTS) {
             // Log a failed check-in
             const failedCheckin = await prisma.FailCheckin.create({
 
