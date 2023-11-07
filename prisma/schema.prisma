@@ -1,5 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+// This is a simple schema for the minimum viable product.
 
 generator client {
   provider = "prisma-client-js"
@@ -12,39 +13,30 @@ datasource db {
 
 model Account {
   id Int @id @default(autoincrement())
+  notificationPhone String
+  patientPhone String
   email String
+
+  /// How many retries before we notify the notificationPhone
+  retries Int
+  /// What time each day to make the check in call
+  callTime DateTime
+  /// Time delay between attempts
+  delay DateTime
 
   @@unique([email])
 }
 
-model Patient {
+model Queue {
   id Int @id @default(autoincrement())
-}
 
-/// A way of getting in touch with either a caretaker or a patient.
-model ContactMethod {
-  id Int @id @default(autoincrement())
-  name String
-  /// A phone number or app instance identifier
-  method String
-}
+  accountId Int
+  account Account @relation(fields: [accountId], references: [id])
 
-/// All the info needed to send a message to a contact method.
-model ContactConfig {
-  id Int @id @default(autoincrement())
-  message String
-}
-
-/// A step in a failure procedure.
-model FailureProcedureStep {
-  /// Whether it's a notification to a caretaker or a 
-  type String
-  contactConfigId Int
-  contactConfig ContactConfig @relation(fields: [contactConfigId], references: [id])
-  parentProcedureId Int
-}
-
-///
-model FailureProcedure {
-  
+  /// 0 indicates that this is the first call attempt; 1+ means it's a retry.
+  attemptIndex Int
+  /// Whether this succeeded, failed, or hasn't happened yet
+  status String
+  /// When this call is going to happen/did happen
+  time DateTime
 }

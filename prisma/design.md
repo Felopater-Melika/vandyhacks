@@ -14,7 +14,9 @@ the queue row comes up we can refer to the source to know what to do.
 
 Oh! We could make the event queue also double as call history.
 
-## Very simple configuration
+## Simple configuration
+For MVP.
+
 - one patient per account
 - one phone number for patient one phone number to notify
 - only phone calls
@@ -24,9 +26,9 @@ Oh! We could make the event queue also double as call history.
   - what time to make the daily call
 - queue entries count which index they are in retrying
 
-I think we jump from that to simple configuration style.
+I think we jump from that to medium configuration style.
 
-## Simple Configuration
+## Medium Configuration
 - each account has contact methods (e.g. phone, sms, app)
 - contact configurations are a contact method and message to send
 - each account can have multiple people to call.

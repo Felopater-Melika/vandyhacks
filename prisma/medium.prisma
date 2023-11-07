@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../dev.db"
+}
+
+model Account {
+  id Int @id @default(autoincrement())
+  email String
+
+  @@unique([email])
+}
+
+model Patient {
+  id Int @id @default(autoincrement())
+}
+
+/// A way of getting in touch with either a caretaker or a patient.
+model ContactMethod {
+  id Int @id @default(autoincrement())
+  name String
+  /// A phone number or app instance identifier
+  method String
+}
+
+/// All the info needed to send a message to a contact method.
+model ContactConfig {
+  id Int @id @default(autoincrement())
+  message String
+}
+
+/// A step in a failure procedure.
+model FailureProcedureStep {
+  /// Whether it's a notification to a caretaker or a 
+  type String
+  contactConfigId Int
+  contactConfig ContactConfig @relation(fields: [contactConfigId], references: [id])
+  parentProcedureId Int
+}
+
+///
+model FailureProcedure {
+  
+}
